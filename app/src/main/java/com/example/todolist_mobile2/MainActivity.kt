@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -38,65 +40,65 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Column(
-                modifier = Modifier
-                    .background(Color.White)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.1f),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Text(
-                        text = "Список дел",
-                        fontSize = 30.sp
-                    )
-                }
-
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .fillMaxWidth(0.95f)
-                        .fillMaxHeight(0.7f)
-                        .border(
-                            width = 2.dp,
-                            color = Color.Black,
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                ) {
-                    Text(
-                        text = "Пока пусто",
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.2f),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        shape = RoundedCornerShape(15.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Black
-                        ),
-                        modifier = Modifier.width(150.dp)
-                    ) {
-                        Text(text = "Добавить дело")
-                    }
-
-                    SaveButton()
-                }
-
-            }
+            Screen()
         }
+    }
+}
+
+@Composable
+fun Screen() {
+
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .fillMaxHeight(0.1f),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(
+                text = "Список дел",
+                fontSize = 30.sp
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth(0.95f)
+                .fillMaxHeight(0.7f)
+                .border(
+                    width = 2.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(8.dp)
+                ).verticalScroll(state = scrollState),
+        ) {
+            Text(
+                text = "Пока пусто",
+            )
+            
+        }
+
+        Row(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .fillMaxHeight(0.2f),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            AddTaskButton()
+
+            SaveButton()
+        }
+
     }
 }
 
@@ -114,5 +116,19 @@ fun SaveButton() {
         modifier = Modifier.width(150.dp)
     ) {
         Text(text = "Сохранить")
+    }
+}
+
+@Composable
+fun AddTaskButton() {
+    Button(
+        onClick = { /*TODO*/ },
+        shape = RoundedCornerShape(15.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black
+        ),
+        modifier = Modifier.width(150.dp)
+    ) {
+        Text(text = "Добавить дело")
     }
 }
