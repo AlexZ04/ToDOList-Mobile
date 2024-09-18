@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -96,7 +98,7 @@ data class Task(
 @Composable
 fun Screen(tasks: MutableList<Task>) {
 
-    val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     MainActivity.tasksAmount += 3
 
@@ -132,7 +134,7 @@ fun Screen(tasks: MutableList<Task>) {
                 )
         ) {
 
-            items(tasks, key = { task -> task.text }) { task ->
+            items(tasks, key = { task -> task.number }) { task ->
                 CreateTask(task, tasks)
             }
 
@@ -156,6 +158,7 @@ fun Screen(tasks: MutableList<Task>) {
                     )
 
                     MainActivity.tasksAmount++
+                    focusManager.clearFocus()
                 },
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -177,8 +180,13 @@ fun Screen(tasks: MutableList<Task>) {
 fun SaveButton() {
     val context = LocalContext.current
 
+    val focusManager = LocalFocusManager.current
+
     Button(
-        onClick = { save(context) },
+        onClick = {
+            save(context)
+            focusManager.clearFocus()
+        },
         shape = RoundedCornerShape(15.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Black
@@ -198,6 +206,8 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
 
     var checked by remember { mutableStateOf(task.isCompleted) }
     var text by remember { mutableStateOf(task.text) }
+
+    val focusManager = LocalFocusManager.current
 
     Row(
         modifier = Modifier
@@ -230,6 +240,9 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                }),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Green,
                     focusedContainerColor = LightGray,
@@ -258,6 +271,9 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                }),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = White,
                     focusedContainerColor = LightGray,
@@ -271,6 +287,7 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
         Image(modifier = Modifier
             .clickable {
                 tasks.remove(task)
+                focusManager.clearFocus()
             }
             .size(50.dp),
             painter = painterResource(id = R.drawable.delete),
@@ -279,6 +296,7 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
         Checkbox(
             checked = checked,
             onCheckedChange = {
+                focusManager.clearFocus()
                 checked = it
                 for (i in 0 until tasks.size) {
                     if (task.number == tasks[i].number) {
