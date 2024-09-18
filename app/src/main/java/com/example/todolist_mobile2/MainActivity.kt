@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
@@ -96,13 +97,6 @@ data class Task(
 fun Screen(tasks: MutableList<Task>) {
 
     val scrollState = rememberScrollState()
-//    val tasks = remember {
-//        mutableStateListOf(
-//            Task("aa", false, false, 0),
-//            Task("bb", true, false, 1),
-//            Task("cc", false, false, 2)
-//        )
-//    }
 
     MainActivity.tasksAmount += 3
 
@@ -136,13 +130,9 @@ fun Screen(tasks: MutableList<Task>) {
                     color = Black,
                     shape = RoundedCornerShape(8.dp)
                 )
-//                .verticalScroll(state = scrollState),
         ) {
 
-//            for (i in 0 until tasks.size) {
-//                CreateTask(tasks[i], tasks)
-//            }
-            items(tasks) { task ->
+            items(tasks, key = { task -> task.text }) { task ->
                 CreateTask(task, tasks)
             }
 
@@ -158,9 +148,15 @@ fun Screen(tasks: MutableList<Task>) {
 
             Button(
                 onClick = {
-//                    tasks.add(Task("Дело", false, true, MainActivity.tasksAmount))
-                    tasks.add(Task("Дело", false, true, MainActivity.tasksAmount))
-                    MainActivity.tasksAmount++},
+                    tasks.add(
+                        Task(
+                            "Дело", false, true,
+                            MainActivity.tasksAmount
+                        )
+                    )
+
+                    MainActivity.tasksAmount++
+                },
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Black
@@ -200,7 +196,7 @@ fun save(context: Context) {
 @Composable
 fun CreateTask(task: Task, tasks: MutableList<Task>) {
 
-    var checked by remember { mutableStateOf(false) }
+    var checked by remember { mutableStateOf(task.isCompleted) }
     var text by remember { mutableStateOf(task.text) }
 
     Row(
@@ -216,93 +212,61 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
 
         if (task.isCompleted) {
 
-            if (!task.isEditable) {
-                TextField(
-                    modifier = Modifier
-                        .background(color = White)
-                        .width(200.dp)
-                        .padding(5.dp),
-                    value = text,
-                    onValueChange = { text = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = LightGray,
-                        unfocusedBorderColor = Gray, focusedBorderColor = Black
-                    ),
-
-                    singleLine = true,
-                    readOnly = true
-                )
-            } else {
-                TextField(
-                    modifier = Modifier
-                        .background(color = White)
-                        .width(200.dp)
-                        .padding(5.dp),
-                    value = text,
-                    onValueChange = { text = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = LightGray,
-                        unfocusedBorderColor = Gray, focusedBorderColor = Black
-                    ),
-                    singleLine = true,
-                )
-            }
+            TextField(
+                modifier = Modifier
+                    .background(color = White)
+                    .width(250.dp)
+                    .padding(5.dp),
+                value = text,
+                onValueChange = {
+                    text = it
+                    for (i in 0 until tasks.size) {
+                        if (task.number == tasks[i].number) {
+                            tasks[i].text = text
+                            break
+                        }
+                    }
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = Green,
+                    focusedContainerColor = LightGray,
+                    unfocusedBorderColor = Gray, focusedBorderColor = Black
+                ),
+                singleLine = true,
+            )
 
         } else {
-            if (!task.isEditable) {
-                TextField(
-                    modifier = Modifier
-                        .background(color = White)
-                        .width(200.dp)
-                        .padding(5.dp),
-                    value = text,
-                    onValueChange = { text = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = LightGray,
-                        unfocusedBorderColor = Gray, focusedBorderColor = Black
-                    ),
-                    singleLine = true,
-                    readOnly = true
-                )
-            } else {
-                TextField(
-                    modifier = Modifier
-                        .background(color = White)
-                        .width(200.dp)
-                        .padding(5.dp),
-                    value = text,
-                    onValueChange = { text = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = LightGray,
-                        unfocusedBorderColor = Gray, focusedBorderColor = Black
-                    ),
-                    singleLine = true,
-                )
-            }
+
+            TextField(
+                modifier = Modifier
+                    .background(color = White)
+                    .width(250.dp)
+                    .padding(5.dp),
+                value = text,
+                onValueChange = {
+                    text = it
+                    for (i in 0 until tasks.size) {
+                        if (task.number == tasks[i].number) {
+                            tasks[i].text = text
+                            break
+                        }
+                    }
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = White,
+                    focusedContainerColor = LightGray,
+                    unfocusedBorderColor = Gray, focusedBorderColor = Black
+                ),
+                singleLine = true,
+            )
 
         }
-
-        Image(modifier = Modifier
-            .clickable { }
-            .size(50.dp),
-            painter = painterResource(id = R.drawable.edit),
-            contentDescription = "Button Image")
 
         Image(modifier = Modifier
             .clickable {
@@ -310,7 +274,7 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
             }
             .size(50.dp),
             painter = painterResource(id = R.drawable.delete),
-            contentDescription = "Button Image")
+            contentDescription = "Delete button")
 
         Checkbox(
             checked = checked,
