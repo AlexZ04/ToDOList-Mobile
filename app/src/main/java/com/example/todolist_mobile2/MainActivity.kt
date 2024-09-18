@@ -54,6 +54,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todolist_mobile2.ui.theme.ToDoListMobile2Theme
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+import com.google.gson.reflect.TypeToken
+import java.io.File
 
 
 class MainActivity : ComponentActivity() {
@@ -72,13 +76,15 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    var tasks = remember {
+                    val tasks = remember {
                         mutableStateListOf(
                             Task("aa", false, false, 0),
-                            Task("bb", true, false, 1),
-                            Task("cc", false, false, 2)
                         )
                     }
+
+                    tasks.clear()
+                    tasks.addAll(load(this))
+
                     Screen(tasks)
                 }
             }
@@ -88,11 +94,12 @@ class MainActivity : ComponentActivity() {
 
 }
 
+
 data class Task(
-    var text: String,
-    var isCompleted: Boolean,
-    var isEditable: Boolean,
-    var number: Number
+    @SerializedName("text") var text: String,
+    @SerializedName("isCompleted") var isCompleted: Boolean,
+    @SerializedName("isEditable") var isEditable: Boolean,
+    @SerializedName("number") var number: Number
 )
 
 @Composable
@@ -169,7 +176,7 @@ fun Screen(tasks: MutableList<Task>) {
                 Text(text = "Добавить дело")
             }
 
-            SaveButton()
+            SaveButton(tasks)
         }
 
     }
@@ -177,14 +184,14 @@ fun Screen(tasks: MutableList<Task>) {
 
 
 @Composable
-fun SaveButton() {
+fun SaveButton(tasks: MutableList<Task>) {
     val context = LocalContext.current
 
     val focusManager = LocalFocusManager.current
 
     Button(
         onClick = {
-            save(context)
+            save(context, tasks)
             focusManager.clearFocus()
         },
         shape = RoundedCornerShape(15.dp),
@@ -197,8 +204,25 @@ fun SaveButton() {
     }
 }
 
-fun save(context: Context) {
+fun save(context: Context, tasks: MutableList<Task>) {
     Toast.makeText(context, "Сохранено!", Toast.LENGTH_SHORT).show()
+
+    val gson = Gson()
+    val json = gson.toJson(tasks)
+
+    val file = File(context.filesDir, "tasks.json")
+    file.writeText(json)
+}
+
+fun load(context: Context): List<Task> {
+    val gson = Gson()
+    val file = File(context.filesDir, "tasks.json")
+
+    return if (file.exists()) {
+        gson.fromJson(file.readText(), object : TypeToken<List<Task>>() {}.type)
+    } else {
+        emptyList()
+    }
 }
 
 @Composable
