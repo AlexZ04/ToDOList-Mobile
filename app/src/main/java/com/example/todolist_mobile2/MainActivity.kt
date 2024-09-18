@@ -18,15 +18,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.todolist_mobile2.ui.theme.ToDoListMobile2Theme
 
 
 class MainActivity : ComponentActivity() {
@@ -58,9 +62,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         setContent {
-            Screen()
+            ToDoListMobile2Theme {
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    var tasks = remember {
+                        mutableStateListOf(
+                            Task("aa", false, false, 0),
+                            Task("bb", true, false, 1),
+                            Task("cc", false, false, 2)
+                        )
+                    }
+                    Screen(tasks)
+                }
+            }
         }
+
     }
 
 }
@@ -73,16 +93,16 @@ data class Task(
 )
 
 @Composable
-fun Screen() {
+fun Screen(tasks: MutableList<Task>) {
 
     val scrollState = rememberScrollState()
-    val tasks = remember {
-        mutableStateListOf(
-            Task("aa", false, false, 0),
-            Task("bb", true, false, 1),
-            Task("cc", false, false, 2)
-        )
-    }
+//    val tasks = remember {
+//        mutableStateListOf(
+//            Task("aa", false, false, 0),
+//            Task("bb", true, false, 1),
+//            Task("cc", false, false, 2)
+//        )
+//    }
 
     MainActivity.tasksAmount += 3
 
@@ -106,7 +126,7 @@ fun Screen() {
             )
         }
 
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .background(White)
                 .fillMaxWidth(0.95f)
@@ -116,11 +136,14 @@ fun Screen() {
                     color = Black,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .verticalScroll(state = scrollState),
+//                .verticalScroll(state = scrollState),
         ) {
 
-            for (i in 0 until tasks.size) {
-                CreateTask(tasks[i], tasks)
+//            for (i in 0 until tasks.size) {
+//                CreateTask(tasks[i], tasks)
+//            }
+            items(tasks) { task ->
+                CreateTask(task, tasks)
             }
 
         }
@@ -134,8 +157,9 @@ fun Screen() {
         ) {
 
             Button(
-                onClick = { tasks.add(Task("Дело", false, true,
-                    MainActivity.tasksAmount))
+                onClick = {
+//                    tasks.add(Task("Дело", false, true, MainActivity.tasksAmount))
+                    tasks.add(Task("Дело", false, true, MainActivity.tasksAmount))
                     MainActivity.tasksAmount++},
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -174,7 +198,7 @@ fun save(context: Context) {
 }
 
 @Composable
-fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
+fun CreateTask(task: Task, tasks: MutableList<Task>) {
 
     var checked by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf(task.text) }
@@ -196,7 +220,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
                 TextField(
                     modifier = Modifier
                         .background(color = White)
-                        .width(225.dp)
+                        .width(200.dp)
                         .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
@@ -208,6 +232,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
                         focusedContainerColor = LightGray,
                         unfocusedBorderColor = Gray, focusedBorderColor = Black
                     ),
+
                     singleLine = true,
                     readOnly = true
                 )
@@ -215,7 +240,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
                 TextField(
                     modifier = Modifier
                         .background(color = White)
-                        .width(225.dp)
+                        .width(200.dp)
                         .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
@@ -236,7 +261,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
                 TextField(
                     modifier = Modifier
                         .background(color = White)
-                        .width(225.dp)
+                        .width(200.dp)
                         .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
@@ -255,7 +280,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
                 TextField(
                     modifier = Modifier
                         .background(color = White)
-                        .width(225.dp)
+                        .width(200.dp)
                         .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
@@ -281,12 +306,7 @@ fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
 
         Image(modifier = Modifier
             .clickable {
-                for (i in 0 until tasks.size) {
-                    if (task.number == tasks[i].number) {
-                        tasks.removeAt(i)
-                        break
-                    }
-                }
+                tasks.remove(task)
             }
             .size(50.dp),
             painter = painterResource(id = R.drawable.delete),
