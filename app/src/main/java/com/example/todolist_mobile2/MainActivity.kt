@@ -16,18 +16,23 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +40,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,7 +106,7 @@ fun Screen() {
         ) {
 
             for (i in 0 until tasks.size) {
-                CreateTask(tasks[i])
+                CreateTask(tasks[i], i)
             }
             
         }
@@ -110,7 +120,7 @@ fun Screen() {
         ) {
 
             Button(
-                onClick = { tasks.add(Triple("added task", false, false)) },
+                onClick = { tasks.add(Triple("Текст дела", false, false)) },
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black
@@ -148,37 +158,52 @@ fun save(context: Context) {
 }
 
 @Composable
-fun CreateTask(task: Triple<String, Boolean, Boolean>) {
+fun CreateTask(task: Triple<String, Boolean, Boolean>, index: Int = 0) {
     var checked by remember { mutableStateOf(false) }
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(task.first) }
 
-    Row {
+    Row(modifier = Modifier.padding(10.dp)
+        .border(
+            width = 2.dp,
+            color = Black,
+            shape = RoundedCornerShape(8.dp)
+        ).padding(10.dp)) {
 
         if (task.second) {
 
             if (!task.third) {
                 TextField(
-                    modifier = Modifier.background(color=Color.LightGray).width(250.dp),
+                    modifier = Modifier
+                        .background(color = White)
+                        .width(225.dp)
+                        .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text(
-                        text = task.first,
-                        textDecoration = TextDecoration.LineThrough,
-                        fontSize = 28.sp
-                    )},
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = White,
+                        focusedContainerColor = LightGray,
+                        unfocusedBorderColor = Gray, focusedBorderColor = Black),
+                    singleLine = true,
                     readOnly = true
                 )
             }
             else {
                 TextField(
-                    modifier = Modifier.background(color=Color.LightGray).width(250.dp),
+                    modifier = Modifier
+                        .background(color = Color.White)
+                        .width(225.dp)
+                        .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text(
-                        text = task.first,
-                        textDecoration = TextDecoration.LineThrough,
-                        fontSize = 28.sp
-                    )},
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = White,
+                        focusedContainerColor = LightGray,
+                        unfocusedBorderColor = Gray, focusedBorderColor = Black),
+                    singleLine = true,
                 )
             }
 
@@ -186,41 +211,60 @@ fun CreateTask(task: Triple<String, Boolean, Boolean>) {
         else {
             if (!task.third) {
                 TextField(
-                    modifier = Modifier.background(color=Color.LightGray).width(250.dp),
+                    modifier = Modifier
+                        .background(color = White)
+                        .width(225.dp)
+                        .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text(
-                        text = task.first,
-                        fontSize = 28.sp
-                    ) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = White,
+                        focusedContainerColor = LightGray,
+                        unfocusedBorderColor = Gray, focusedBorderColor = Black),
+                    singleLine = true,
                     readOnly = true
                 )
             }
             else {
                 TextField(
-                    modifier = Modifier.background(color=Color.LightGray).width(250.dp),
+                    modifier = Modifier
+                        .background(color = White)
+                        .width(225.dp)
+                        .padding(5.dp),
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text(
-                        text = task.first,
-                        fontSize = 28.sp
-                    ) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = White,
+                        focusedContainerColor = LightGray,
+                        unfocusedBorderColor = Gray, focusedBorderColor = Black),
+                    singleLine = true,
                 )
             }
 
         }
 
-        Image(modifier = Modifier.clickable {  }.size(50.dp),
+
+        Image(modifier = Modifier
+            .clickable { }
+            .size(50.dp),
             painter = painterResource(id = R.drawable.edit),
             contentDescription = "Button Image")
 
-        Image(modifier = Modifier.clickable {  }.size(50.dp),
+        Image(modifier = Modifier
+            .clickable { }
+            .size(50.dp),
             painter = painterResource(id = R.drawable.delete),
             contentDescription = "Button Image")
 
         Checkbox(
             checked = checked,
-            onCheckedChange = { checked = it }
+            onCheckedChange = { checked = it },
+            colors = CheckboxDefaults.colors(checkmarkColor = White,
+                checkedColor = Black)
         )
 
     }
