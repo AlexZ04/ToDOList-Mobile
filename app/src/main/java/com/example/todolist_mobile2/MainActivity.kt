@@ -35,9 +35,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.LightGray
@@ -50,6 +50,10 @@ import androidx.compose.ui.unit.sp
 
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        var tasksAmount = 0
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -64,7 +68,8 @@ class MainActivity : ComponentActivity() {
 data class Task(
     var text: String,
     var isCompleted: Boolean,
-    var isEditable: Boolean
+    var isEditable: Boolean,
+    var number: Number
 )
 
 @Composable
@@ -73,22 +78,24 @@ fun Screen() {
     val scrollState = rememberScrollState()
     val tasks = remember {
         mutableStateListOf(
-            Task("aa", false, false),
-            Task("bb", true, false),
-            Task("cc", false, false)
+            Task("aa", false, false, 0),
+            Task("bb", true, false, 1),
+            Task("cc", false, false, 2)
         )
     }
 
+    MainActivity.tasksAmount += 3
+
     Column(
         modifier = Modifier
-            .background(Color.White)
+            .background(White)
             .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier
-                .background(Color.White)
+                .background(White)
                 .fillMaxWidth()
                 .fillMaxHeight(0.1f),
             horizontalArrangement = Arrangement.SpaceAround
@@ -101,36 +108,38 @@ fun Screen() {
 
         Column(
             modifier = Modifier
-                .background(Color.White)
+                .background(White)
                 .fillMaxWidth(0.95f)
                 .fillMaxHeight(0.7f)
                 .border(
                     width = 2.dp,
-                    color = Color.Black,
+                    color = Black,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .verticalScroll(state = scrollState),
         ) {
 
             for (i in 0 until tasks.size) {
-                CreateTask(tasks[i], i)
+                CreateTask(tasks[i], tasks)
             }
 
         }
 
         Row(
             modifier = Modifier
-                .background(Color.White)
+                .background(White)
                 .fillMaxWidth()
                 .fillMaxHeight(0.2f),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
 
             Button(
-                onClick = { tasks.add(Task("Текст дела", false, false)) },
+                onClick = { tasks.add(Task("Дело", false, true,
+                    MainActivity.tasksAmount))
+                    MainActivity.tasksAmount++},
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black
+                    containerColor = Black
                 ),
                 modifier = Modifier.width(150.dp)
             ) {
@@ -152,7 +161,7 @@ fun SaveButton() {
         onClick = { save(context) },
         shape = RoundedCornerShape(15.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black
+            containerColor = Black
         ),
         modifier = Modifier.width(150.dp)
     ) {
@@ -165,7 +174,8 @@ fun save(context: Context) {
 }
 
 @Composable
-fun CreateTask(task: Task, index: Int = 0) {
+fun CreateTask(task: Task, tasks: SnapshotStateList<Task>) {
+
     var checked by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf(task.text) }
 
@@ -204,7 +214,7 @@ fun CreateTask(task: Task, index: Int = 0) {
             } else {
                 TextField(
                     modifier = Modifier
-                        .background(color = Color.White)
+                        .background(color = White)
                         .width(225.dp)
                         .padding(5.dp),
                     value = text,
@@ -263,7 +273,6 @@ fun CreateTask(task: Task, index: Int = 0) {
 
         }
 
-
         Image(modifier = Modifier
             .clickable { }
             .size(50.dp),
@@ -271,14 +280,30 @@ fun CreateTask(task: Task, index: Int = 0) {
             contentDescription = "Button Image")
 
         Image(modifier = Modifier
-            .clickable { }
+            .clickable {
+                for (i in 0 until tasks.size) {
+                    if (task.number == tasks[i].number) {
+                        tasks.removeAt(i)
+                        break
+                    }
+                }
+            }
             .size(50.dp),
             painter = painterResource(id = R.drawable.delete),
             contentDescription = "Button Image")
 
         Checkbox(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = {
+                checked = it
+                for (i in 0 until tasks.size) {
+                    if (task.number == tasks[i].number) {
+                        tasks[i].isCompleted = it
+                        break
+                    }
+                }
+
+            },
             colors = CheckboxDefaults.colors(
                 checkmarkColor = White,
                 checkedColor = Black
