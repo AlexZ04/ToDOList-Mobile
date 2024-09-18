@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                     tasks.clear()
                     tasks.addAll(load(this))
 
-                    Screen(tasks)
+                    Screen(tasks, this)
                 }
             }
         }
@@ -103,11 +103,9 @@ data class Task(
 )
 
 @Composable
-fun Screen(tasks: MutableList<Task>) {
+fun Screen(tasks: MutableList<Task>, context: Context) {
 
     val focusManager = LocalFocusManager.current
-
-    MainActivity.tasksAmount += 3
 
     Column(
         modifier = Modifier
@@ -171,12 +169,27 @@ fun Screen(tasks: MutableList<Task>) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Black
                 ),
-                modifier = Modifier.width(150.dp)
+                modifier = Modifier.width(120.dp)
             ) {
-                Text(text = "Добавить дело")
+                Text(text = "Добавить")
             }
 
             SaveButton(tasks)
+
+            Button(
+                onClick = {
+                    tasks.clear()
+                    tasks.addAll(load(context))
+                    focusManager.clearFocus()
+                },
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Black
+                ),
+                modifier = Modifier.width(120.dp)
+            ) {
+                Text(text = "Загрузить")
+            }
         }
 
     }
@@ -198,7 +211,7 @@ fun SaveButton(tasks: MutableList<Task>) {
         colors = ButtonDefaults.buttonColors(
             containerColor = Black
         ),
-        modifier = Modifier.width(150.dp)
+        modifier = Modifier.width(120.dp)
     ) {
         Text(text = "Сохранить")
     }
