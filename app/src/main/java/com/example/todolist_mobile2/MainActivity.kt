@@ -122,12 +122,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                 } else {
-                    Log.d("MyLog", "Request failed with code: ${response.code()}")
+                    Log.d("MyLog", "Error with getting data: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<List<Note>>, t: Throwable) {
-                Log.d("MyLog", "Network request failed", t)
+                Log.d("MyLog", "Error with getting data", t)
             }
 
         })
