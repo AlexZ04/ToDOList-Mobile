@@ -152,12 +152,16 @@ data class Note(
 interface TaskApi {
     @GET("Tasks")
     fun fetchData(): Call<List<Note>>
+
     @POST("Tasks")
     fun createTask(@Body newTask: Note): Call<Note>
+
     @DELETE("Tasks/{id}")
     fun deleteTask(@Path("id") id: Int): Call<Void>
+
     @PATCH("Tasks/{id}")
     fun checkTask(@Path("id") id: Int): Call<Void>
+
     @PUT("Tasks/{id}")
     fun changeTask(@Path("id") id: Number, @Body newTask: Note): Call<Void>
 }
@@ -219,14 +223,20 @@ fun Screen(tasks: MutableList<Task>, context: Context) {
                     changeTaskText()
 
                     val call =
-                        messagesApi.createTask(Note(MainActivity.tasksAmount - 1, "Дело",
-                            false))
+                        messagesApi.createTask(
+                            Note(
+                                MainActivity.tasksAmount - 1, "Дело",
+                                false
+                            )
+                        )
                     call.enqueue(object : Callback<Note> {
                         override fun onResponse(call: Call<Note>, response: Response<Note>) {
                             if (!response.isSuccessful) {
-                                Log.d("MyLog", "Error with creating task: ${response.code()}")
-                            }
-                            else {
+                                Log.d(
+                                    "MyLog", "Error with creating task: " +
+                                            "${response.code()}"
+                                )
+                            } else {
                                 val data = response.body()
 
                                 if (data != null) {
@@ -362,11 +372,13 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         if (response.isSuccessful) {
                             tasks.remove(task)
+                        } else {
+                            Log.d("MyLog", "Error with deleting task: ${response.code()}")
                         }
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        Log.e("MainActivity", "Failed to delete task", t)
+                        Log.e("MainActivity", "Error with deleting task", t)
                         t.printStackTrace()
                     }
                 })
@@ -393,11 +405,13 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
                                     break
                                 }
                             }
+                        } else {
+                            Log.d("MyLog", "Error with checking task: ${response.code()}")
                         }
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        Log.e("MainActivity", "Failed to rename task", t)
+                        Log.e("MainActivity", "Error with checking task", t)
                         t.printStackTrace()
                     }
                 })
@@ -415,8 +429,10 @@ fun CreateTask(task: Task, tasks: MutableList<Task>) {
 
 fun changeTaskText() {
     val call =
-        messagesApi.changeTask(editingTask,
-            Note(editingTask, editingText, editingComp))
+        messagesApi.changeTask(
+            editingTask,
+            Note(editingTask, editingText, editingComp)
+        )
     call.enqueue(object : Callback<Void> {
         override fun onResponse(call: Call<Void>, response: Response<Void>) {
             if (!response.isSuccessful) {
@@ -425,7 +441,7 @@ fun changeTaskText() {
         }
 
         override fun onFailure(call: Call<Void>, t: Throwable) {
-            Log.d("MyLog", "Ошибка сети при создании задачи", t)
+            Log.d("MyLog", "Error with editing task", t)
         }
     })
 }
